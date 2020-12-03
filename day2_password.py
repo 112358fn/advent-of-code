@@ -17,8 +17,6 @@
 ## TEST: python -m unittest day2_password.py
 ## RUN: ./day2_password.py $(cat day2_passwds_policies.txt )
 #
-
-
 ##--- Part Two ---
 # While it appears you validated the passwords correctly, they don't seem to be what the Official Toboggan Corporate Authentication System is expecting.
 # The shopkeeper suddenly realizes that he just accidentally explained the password policy rules from his old job at the sled rental place down the street! The Official Toboggan Corporate Policy actually works a little differently.
