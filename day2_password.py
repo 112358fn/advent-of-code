@@ -87,8 +87,10 @@ if __name__ == "__main__":
     from itertools import compress
     from pprint import pprint
 
-    parser = argparse.ArgumentParser(description="Repair this expense report")
-    parser.add_argument("entries", type=str, nargs="+", help="expense report entries")
+    parser = argparse.ArgumentParser(description="Check the compliant passwords")
+    parser.add_argument(
+        "entries", type=str, nargs="+", help="policy - passwords entries"
+    )
     parser.add_argument(
         "--new",
         dest="new_policy",
