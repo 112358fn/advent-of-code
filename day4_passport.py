@@ -30,9 +30,12 @@
 # The fourth passport is missing two fields, cid and byr. Missing cid is fine, but missing any other field is not, so this passport is invalid.
 # According to the above rules, your improved system would report 2 valid passports.
 # Count the number of valid passports - those that have all required fields. Treat cid as optional. In your batch file, how many passports are valid?
-
 # Your puzzle answer was 264.
 # The first half of this puzzle is complete! It provides one gold star: *
+#
+## TEST: python -m unittest day4_passport.py
+## RUN:./day4_passport.py day4_passports_data.txt --validate
+
 # --- Part Two ---
 # The line is moving more quickly now, but you overhear airport security talking about how passports with invalid data are getting through. Better add some data validation, quick!
 # You can continue to ignore the cid field, but each other field has strict rules about what values are valid for automatic validation:
@@ -82,6 +85,9 @@
 # eyr:2022
 # iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719
 # Count the number of valid passports - those that have all required fields and valid values. Continue to treat cid as optional. In your batch file, how many passports are valid?
+#
+## TEST: python -m unittest day4_passport.py
+## RUN:./day4_passport.py day4_passports_data.txt --validate
 
 
 import re
@@ -91,9 +97,37 @@ import time
 
 def check_passport(passport_str, validate=False):
     if validate:
-        regex = r"(?=.* byr:(19[2-9][0-9]|200[0-2]) )(?=.* iyr:(201[0-9]|2020) )(?=.* eyr:(202[0-9]|2030) )(?=.* hgt:(1[5-8][0-9]cm|19[0-3]cm|59in|6[0-9]in|7[0-6]in) )(?=.* hcl:(#[0-9a-f]{6}) )(?=.* ecl:(amb|blu|brn|gry|grn|hzl|oth) )(?=.* pid:([0-9]{9}) )"
+        # 1920 < byr < 2002
+        byr = r"(?=.* byr:(19[2-9][0-9]|200[0-2]) )"
+        # 2010 < iyr < 2020
+        iyr = r"(?=.* iyr:(201[0-9]|2020) )"
+        # 2020 < eyr < 2030
+        eyr = r"(?=.* eyr:(202[0-9]|2030) )"
+        # 150cm < hgt < 193cm or 59in < hgt < 76in
+        hgt = r"(?=.* hgt:(1[5-8][0-9]cm|19[0-3]cm|59in|6[0-9]in|7[0-6]in) )"
+        # #000000 < hcl < #ffffff
+        hcl = r"(?=.* hcl:(#[0-9a-f]{6}) )"
+        # ecl in [amb|blu|brn|gry|grn|hzl|oth]
+        ecl = r"(?=.* ecl:(amb|blu|brn|gry|grn|hzl|oth) )"
+        # 000000000 < pid < 999999999
+        pid = r"(?=.* pid:([0-9]{9}) )"
+        # regex = sum of conditions
+        regex = byr + iyr + eyr + hgt + hcl + ecl + pid
     else:
-        regex = r"(?=.* (byr:))(?=.* (iyr:))(?=.* (eyr:))(?=.* (hgt:))(?=.* (hcl:))(?=.* (ecl:))(?=.* (pid:))"
+        # byr = r"(?=.* (byr:))"
+        # iyr = r"(?=.* (iyr:))"
+        # eyr = r"(?=.* (eyr:))"
+        # hgt = r"(?=.* (hgt:))"
+        # hcl = r"(?=.* (hcl:))"
+        # ecl = r"(?=.* (ecl:))"
+        # pid = r"(?=.* (pid:))"
+        regex = "".join(
+            [
+                f"(?=.* ({field}:))"
+                for field in ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
+            ]
+        )
+        regex.encode("unicode_escape")
     matches = re.findall(regex, passport_str)
     return len(matches) > 0
 
