@@ -89,28 +89,18 @@ import unittest
 import time
 
 
-def check_passport(passport_str):
-    regex = r"(?=.* (byr:))(?=.* (iyr:))(?=.* (eyr:))(?=.* (hgt:))(?=.* (hcl:))(?=.* (ecl:))(?=.* (pid:))"
-    matches = re.findall(regex, passport_str)
-    return len(matches) > 0
-
-
-def validate_passport(passport_str):
-    regex = r"(?=.* byr:(19[2-9][0-9]|200[0-2]) )(?=.* iyr:(201[0-9]|2020) )(?=.* eyr:(202[0-9]|2030) )(?=.* hgt:(1[5-8][0-9]cm|19[0-3]cm|59in|6[0-9]in|7[0-6]in) )(?=.* hcl:(#[0-9a-f]{6}) )(?=.* ecl:(amb|blu|brn|gry|grn|hzl|oth) )(?=.* pid:([0-9]{9}) )"
+def check_passport(passport_str, validate=False):
+    if validate:
+        regex = r"(?=.* byr:(19[2-9][0-9]|200[0-2]) )(?=.* iyr:(201[0-9]|2020) )(?=.* eyr:(202[0-9]|2030) )(?=.* hgt:(1[5-8][0-9]cm|19[0-3]cm|59in|6[0-9]in|7[0-6]in) )(?=.* hcl:(#[0-9a-f]{6}) )(?=.* ecl:(amb|blu|brn|gry|grn|hzl|oth) )(?=.* pid:([0-9]{9}) )"
+    else:
+        regex = r"(?=.* (byr:))(?=.* (iyr:))(?=.* (eyr:))(?=.* (hgt:))(?=.* (hcl:))(?=.* (ecl:))(?=.* (pid:))"
     matches = re.findall(regex, passport_str)
     return len(matches) > 0
 
 
 def extract_passports(passports_file):
-    passports = []
     with open(passports_file) as f:
-        lines = f.readlines()
-        blanks = [i for i, x in enumerate(lines) if x == "\n"]
-        blanks = [-1, *blanks, len(lines)]
-        for i in range(len(blanks) - 1):
-            start = blanks[i] + 1
-            end = blanks[i + 1]
-            passports.append("".join(lines[start:end]))
+        passports = f.read().split("\n\n")
         passports = [
             " " + passport.replace("\n", " ").strip() + " " for passport in passports
         ]
@@ -170,10 +160,10 @@ class TestPassportCheck(unittest.TestCase):
 
     def test_validation(self):
         passports = extract_passports("day4_invalid_data.txt")
-        results = [validate_passport(passport) for passport in passports]
+        results = [check_passport(passport, validate=True) for passport in passports]
         self.assertEqual(results, [False, False, False, False])
         passports = extract_passports("day4_valid_data.txt")
-        results = [validate_passport(passport) for passport in passports]
+        results = [check_passport(passport, validate=True) for passport in passports]
         self.assertEqual(results, [True, True, True, True])
 
 
@@ -181,28 +171,23 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Verify the passports")
-    parser.add_argument("passports_file", type=str, help="passports")
+    parser.add_argument(
+        "passports_file",
+        help="passports file",
+    )
     parser.add_argument(
         "--validate",
         dest="validate",
         action="store_const",
         const=True,
         default=False,
-        help="validate the data",
+        help="validate the passports data",
     )
 
     passports_file = parser.parse_args().passports_file
     validate = parser.parse_args().validate
     passports = extract_passports(passports_file)
-    print(len(passports))
-    if not validate:
-        results = [check_passport(passport) for passport in passports]
-
-        print(
-            f"According to the above rules, your improved system would report {sum(results)} valid passports."
-        )
-    else:
-        results = [validate_passport(passport) for passport in passports]
-        print(
-            f"According to the above rules, your improved system would report {sum(results)} valid passports."
-        )
+    results = [check_passport(passport, validate) for passport in passports]
+    print(
+        f"According to the above rules, your improved system would report {sum(results)} valid of {len(passports)} passports."
+    )
