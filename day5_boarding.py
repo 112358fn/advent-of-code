@@ -55,8 +55,10 @@ def decode(code, positive="F"):
 
 def findseat(boarding_pass):
     boarding_pass = boarding_pass.strip()
-    row = decode(boarding_pass[:7], positive="F")
-    column = decode(boarding_pass[7:], positive="L")
+    # row = decode(boarding_pass[:7], positive="F")
+    # column = decode(boarding_pass[7:], positive="L")
+    row = int(boarding_pass[:7].replace("F", "0").replace("B", "1"), 2)
+    column = int(boarding_pass[7:].replace("L", "0").replace("R", "1"), 2)
     seat_id = (row * 8) + column
     return row, column, seat_id
 
