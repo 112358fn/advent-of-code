@@ -106,3 +106,8 @@ if __name__ == "__main__":
     seat_range = set(range(lowest_seat_id, highest_seat_id + 1))
     seat_id = seat_range.difference(seat_IDs)
     print("The ID of your seat is", *seat_id)
+    # This  might be more memory efficient: using range we generate
+    for seat_id in range(lowest_seat_id, highest_seat_id + 1):
+        if seat_id not in seat_IDs:
+            print(f"The ID of your seat is {seat_id}")
+            break
