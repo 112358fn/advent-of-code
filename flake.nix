@@ -32,13 +32,11 @@
               inherit inputs pkgs;
               modules = [
                 {
-                  packages = with pkgs; [
-                    vscodium
-                  ];
                   languages = {
                     python = {
                       enable = true;
-                      version = "3.12";
+                      package = pkgs.python312;
+                      venv.enable = true;
                     };
                     rust = {
                       enable = true;
